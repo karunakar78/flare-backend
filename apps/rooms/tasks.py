@@ -18,12 +18,6 @@ def close_room_on_expiry(self, room_id: str):
 
 @shared_task(bind=True, max_retries=3)
 def destroy_room(self, room_id: str, reason: str = "unknown"):
-    """
-    Central room destruction task.
-    1. Marks room inactive
-    2. Wipes messages from Redis cache
-    3. Clears memberships and waitlist
-    """
     from apps.rooms.models import Room, RoomMembership, WaitlistEntry
 
     try:
@@ -42,7 +36,20 @@ def destroy_room(self, room_id: str, reason: str = "unknown"):
     from django.core.cache import cache
     cache.delete(f"room:{room_id}:messages")
 
-    # 3. Clear memberships and waitlist
+    # 3. Broadcast room_closed to all connected WebSocket clients
+    from channels.layers import get_channel_layer
+    from asgiref.sync import async_to_sync
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"room_{room_id}",
+        {
+            "type": "room.closed",
+            "room_id": room_id,
+            "reason": reason,
+        },
+    )
+
+    # 4. Clear memberships and waitlist
     RoomMembership.objects.filter(room=room, is_active=True).update(is_active=False)
     WaitlistEntry.objects.filter(room=room).delete()
 

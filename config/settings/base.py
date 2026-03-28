@@ -12,6 +12,7 @@ DEBUG = env.bool("DEBUG", default=False)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
 DJANGO_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -24,6 +25,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    "channels",
     "django_celery_beat",
 ]
 
@@ -128,3 +130,13 @@ CELERY_TIMEZONE = "UTC"
 
 # --- Room defaults ---
 ROOM_EMPTY_GRACE_MINUTES = 5
+
+# --- Django Channels ---
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [env("REDIS_URL", default="redis://localhost:6379")],
+        },
+    }
+}
