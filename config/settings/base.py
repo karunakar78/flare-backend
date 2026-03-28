@@ -24,6 +24,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    "django_celery_beat",
 ]
 
 LOCAL_APPS = [
@@ -117,3 +118,12 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 OTP_EXPIRY_MINUTES = 10
+
+# --- Celery ---
+CELERY_BROKER_URL = env("REDIS_URL", default="redis://localhost:6379")
+CELERY_RESULT_BACKEND = env("REDIS_URL", default="redis://localhost:6379")
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_TIMEZONE = "UTC"
+
+# --- Room defaults ---
+ROOM_EMPTY_GRACE_MINUTES = 5
