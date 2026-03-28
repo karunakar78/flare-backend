@@ -132,6 +132,8 @@ class MeView(APIView):
     GET /api/v1/auth/me/
     Returns current verified user details.
     """
+    authentication_classes = []
+    
     def get(self, request):
         if not request.user or not request.user.is_authenticated:
             return Response(
