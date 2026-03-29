@@ -72,9 +72,7 @@ class RoomCreateView(APIView):
         serializer.is_valid(raise_exception=True)
         room = serializer.save()
 
-        # Schedule expiry task to fire exactly when the room timer ends
         from apps.rooms.tasks import close_room_on_expiry
-
         close_room_on_expiry.apply_async(
             args=[str(room.id)],
             eta=room.expires_at,

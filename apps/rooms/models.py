@@ -48,8 +48,8 @@ class Room(models.Model):
     )
 
     capacity = models.PositiveIntegerField(default=50)
-    radius_km = models.FloatField(choices=RADIUS_CHOICES, default=2.0)
-    timer_minutes = models.IntegerField(choices=TIMER_CHOICES, default=60)
+    radius_km = models.FloatField(default=2.0)
+    timer_minutes = models.IntegerField(default=60)
 
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
